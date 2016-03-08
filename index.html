@@ -13,7 +13,14 @@
     </style>
 </head>
 <body>
-    <p class="content" data-select-and-tag>Highlight any word(s) in this sentence</p>
+    <p class="content" select-and-tag>Highlight any word(s) in this sentence</p>
     <script type="text/javascript" src="./select-and-tag.js"></script>
+    <script type="text/javascript">
+        new SelectAndTag({
+            onSelect: function (selectedText) {
+                console.log(selectedText, "haha");
+            }
+        })
+    </script>
 </body>
 </html>
