@@ -23,75 +23,111 @@ function SelectAndTag (options) {
 		iL,
 		options,
 		tagList,
-		tagElement;
+		tagElement,
+		sentenceIndex = 0;
 
-	//Add Fallbacks
-	options = options || {};
-	options.onSelect = options.onSelect || function (selectedText) {
-		console.log(selectedText);
-	};
-	options.onTag = options.onTag || function (selectedText, tag) {
-		console.log(selectedText, tag);
-	};
-	options.tags = options.tags || [];
 
-	//Get all elements with attribute name 'select-and-tag'
-	elements = document.querySelectorAll('[' + ATTR_NAME + ']');
-
-	tagList = document.querySelector('tagList');
-
-	if(tagList === null) {
-		tagList = document.createElement('div');
-		tagList.className = ['tag-list'];
-
-		options.tags.forEach(function (tag) {
-			tagElement = document.createElement('span');
-			tagElement.innerHTML = tag;
-			tagElement.addEventListener('click', function () {
-				options.onTag.call(null, selectedText, tag)
-			})
-			tagList.appendChild(tagElement);
-		})
-
-		document.body.appendChild(tagList);
+	var sanitizeOptions = function (_options) {
+		//Add Fallbacks
+		_options = _options || {};
+		_options.onSelect = _options.onSelect || function (selectedText) {
+					console.log(selectedText);
+				};
+		_options.onTag = _options.onTag || function (selectedText, tag) {
+					console.log(selectedText, tag);
+				};
+		_options.tags = _options.tags || [];
+		_options.sentences = _options.sentences || [];
 	}
 
-	//For each element, add a onmouseup event
-	for ( i = 0, iL = elements.length; i < iL; i++) {
-		element = elements[i];
+	var updateSentence = function () {
+		sentenceIndex++;
 
-		element.onmouseup = function (event) {
-			//Get the selection Object
-			selection = window.getSelection();
+		if(sentenceIndex >= options.sentences.length) {
+			element.innerHTML = 'You have reached the end :)';
+			return;
+		}
 
-			//Get the complete text
-			text = selection.anchorNode.data;
+		for ( i = 0, iL = elements.length; i < iL; i++) {
+			element = elements[i];
 
-			//Get the start index
-			start = selection.anchorOffset;
+			element.innerHTML = options.sentences[sentenceIndex];
+		}
+	}
 
-			//Get the end index
-			end = selection.focusOffset;
+	var setupTagList = function () {
+		tagList = document.querySelector('tagList');
 
-			//Get the Selected Text
-			selectedText = text.substring(start, end).trim();
+		if(tagList === null) {
+			tagList = document.createElement('div');
+			tagList.className = ['tag-list'];
 
-			//Check if selection is invalid or if it contains just blank spaces
-			if (start !== end && selectedText.length > 0) {
+			options.tags.forEach(function (tag) {
+				tagElement = document.createElement('span');
+				tagElement.innerHTML = tag;
+				tagElement.addEventListener('click', function () {
+					options.onTag.call(null, selectedText, tag);
+					tagList.style.display = 'none';
+					updateSentence()
+				})
+				tagList.appendChild(tagElement);
+			})
 
-				//Set the attribute value
-				element.setAttribute(ATTR_NAME, selectedText);
-				options.onSelect.call(null, selectedText);
+			document.body.appendChild(tagList);
+		}
+	};
 
-				//show the tag list
-				tagList.style.display = 'block';
-				tagList.style.top = event.clientY + 30 + 'px';
-				tagList.style.left = event.clientX - 100 + 'px';
-			}
-			else {
-				//hide the tag list
-				tagList.style.display = 'none';
+	var setupSentences = function () {
+		//Get all elements with attribute name 'select-and-tag'
+		elements = document.querySelectorAll('[' + ATTR_NAME + ']');
+
+		//For each element, add a onmouseup event
+		for ( i = 0, iL = elements.length; i < iL; i++) {
+			element = elements[i];
+
+			element.innerHTML = options.sentences[sentenceIndex];
+
+			element.onmouseup = function (event) {
+				//Get the selection Object
+				selection = window.getSelection();
+
+				//Get the complete text
+				text = selection.anchorNode.data;
+
+				//Get the start index
+				start = selection.anchorOffset;
+
+				//Get the end index
+				end = selection.focusOffset;
+
+				//Get the Selected Text
+				selectedText = text.substring(start, end).trim();
+
+				//Check if selection is invalid or if it contains just blank spaces
+				if (start !== end && selectedText.length > 0) {
+
+					//Set the attribute value
+					element.setAttribute(ATTR_NAME, selectedText);
+					options.onSelect.call(null, selectedText);
+
+					//show the tag list
+					tagList.style.display = 'block';
+					tagList.style.top = event.clientY + 30 + 'px';
+					tagList.style.left = event.clientX - 100 + 'px';
+				}
+				else {
+					//hide the tag list
+					tagList.style.display = 'none';
+				}
 			}
 		}
 	}
+
+	function init () {
+		sanitizeOptions(options);
+		setupSentences();
+		setupTagList();
+	}
+
+	init();
 }
