@@ -1,0 +1,19 @@
+{
+  "name": "select-and-tag",
+  "homepage": "https://github.com/avirati/select-and-tag",
+  "authors": [
+    "Avinash Verma <eyedagger@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/bower_components",
+    "test",
+    "tests"
+  ]
+}
