@@ -21,14 +21,40 @@ function SelectAndTag (options) {
 		selectedText,
 		i,
 		iL,
-		options;
+		options,
+		tagList,
+		tagElement;
 
+	//Add Fallbacks
 	options = options || {};
 	options.onSelect = options.onSelect || function (selectedText) {
 		console.log(selectedText);
-	}
+	};
+	options.onTag = options.onTag || function (selectedText, tag) {
+		console.log(selectedText, tag);
+	};
+	options.tags = options.tags || [];
+
 	//Get all elements with attribute name 'select-and-tag'
 	elements = document.querySelectorAll('[' + ATTR_NAME + ']');
+
+	tagList = document.querySelector('tagList');
+
+	if(tagList === null) {
+		tagList = document.createElement('div');
+		tagList.className = ['tag-list'];
+
+		options.tags.forEach(function (tag) {
+			tagElement = document.createElement('span');
+			tagElement.innerHTML = tag;
+			tagElement.addEventListener('click', function () {
+				options.onTag.call(null, selectedText, tag)
+			})
+			tagList.appendChild(tagElement);
+		})
+
+		document.body.appendChild(tagList);
+	}
 
 	//For each element, add a onmouseup event
 	for ( i = 0, iL = elements.length; i < iL; i++) {
@@ -56,6 +82,15 @@ function SelectAndTag (options) {
 				//Set the attribute value
 				element.setAttribute(ATTR_NAME, selectedText);
 				options.onSelect.call(null, selectedText);
+
+				//show the tag list
+				tagList.style.display = 'block';
+				tagList.style.top = event.clientY + 30 + 'px';
+				tagList.style.left = event.clientX - 100 + 'px';
+			}
+			else {
+				//hide the tag list
+				tagList.style.display = 'none';
 			}
 		}
 	}
