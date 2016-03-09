@@ -21,10 +21,9 @@ function SelectAndTag (options) {
 		selectedText,
 		i,
 		iL,
-		options,
 		tagList,
 		tagElement,
-		sentenceIndex = 0;
+		sentenceIndex = 0
 
 
 	var sanitizeOptions = function (_options) {
@@ -38,11 +37,11 @@ function SelectAndTag (options) {
 				};
 		_options.tags = _options.tags || [];
 		_options.sentences = _options.sentences || [];
+		_options.submitBtn = document.querySelector(_options.submitBtn);
 	}
 
 	var updateSentence = function () {
 		sentenceIndex++;
-
 		if(sentenceIndex >= options.sentences.length) {
 			element.innerHTML = 'You have reached the end :)';
 			return;
@@ -53,6 +52,10 @@ function SelectAndTag (options) {
 
 			element.innerHTML = options.sentences[sentenceIndex];
 		}
+	}
+
+	var attachSubmitEvent = function () {
+		options.submitBtn.addEventListener('click', updateSentence);
 	}
 
 	var setupTagList = function () {
@@ -68,7 +71,6 @@ function SelectAndTag (options) {
 				tagElement.addEventListener('click', function () {
 					options.onTag.call(null, selectedText, tag);
 					tagList.style.display = 'none';
-					updateSentence()
 				})
 				tagList.appendChild(tagElement);
 			})
@@ -126,6 +128,7 @@ function SelectAndTag (options) {
 	function init () {
 		sanitizeOptions(options);
 		setupSentences();
+		attachSubmitEvent();
 		setupTagList();
 	}
 
